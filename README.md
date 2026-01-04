@@ -27,11 +27,19 @@ The system is built using **Python** and **Streamlit** for the interactive dashb
 
 ## 🚀 How to Run Locally
 
-### 1. Prerequisites
-Ensure you have **Python 3.8+** installed. You can verify this by running:
-```bash
-python --version
-
-### 2. Clone the Repository
+## 2. Clone the Repository
 git clone [https://github.com/your-username/AI-Network-IDS.git](https://github.com/your-username/AI-Network-IDS.git)
 cd AI-Network-IDS
+
+## 2. Install Dependencies
+Install the required Python libraries using pip:
+pip install -r requirements.txt
+
+## 4. Setup the Dataset
+Ensure the dataset file (Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv) is present in the project folder.
+
+## 5. Run the Application
+Start the Streamlit server:
+streamlit run nids_main.py
+
+
