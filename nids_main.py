@@ -1,6 +1,3 @@
-# nids_main.py
-# [cite_start]Reconstructed based on requirements in Technical Implementation Manual [cite: 30-36, 45, 61-62]
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -14,7 +11,7 @@ st.set_page_config(page_title="AI-NIDS Dashboard", layout="wide")
 st.title("🛡️ AI-Powered Network Intrusion Detection System")
 st.markdown("### Real-Time Network Traffic Monitoring & Analysis")
 
-# [cite_start]1. Data Management Strategy: Production Mode [cite: 47-53]
+# 1. Data Management Strategy: Production Mode
 # Loading real-world CIC-IDS2017 cybersecurity data
 @st.cache_data
 def load_data():
@@ -36,7 +33,6 @@ def load_data():
     df['Attack_Label'] = df['Label'].apply(lambda x: 0 if 'BENIGN' in str(x).upper() else 1)
 
     # Rename columns to match the Simulator inputs
-    # We map the technical CSV columns to our Dashboard's simple inputs
     column_mapping = {
         'Total Length of Fwd Packets': 'Packet_Size',
         'Flow Duration': 'Duration',
@@ -46,7 +42,6 @@ def load_data():
     df.rename(columns=column_mapping, inplace=True)
 
     # Select ONLY the 4 features used in the Simulator + the Label
-    # meaningful order: Packet_Size, Duration, Protocol, Byte_Rate
     required_columns = ['Packet_Size', 'Duration', 'Protocol', 'Byte_Rate', 'Attack_Label']
     
     # Verify columns exist
@@ -59,17 +54,10 @@ def load_data():
 
 df = load_data()
 
-# Temporary Helper: Print an attack example to the terminal
-print("\n--- ATTACK EXAMPLE FOR TESTING ---")
-attack_row = df[df['Attack_Label'] == 1].iloc[0]
-print(attack_row)
-print("----------------------------------\n")
-
 # Sidebar - Operational Workflow 
 st.sidebar.header("Operational Control")
 
 # 2. Model Training 
-# Initialize Random Forest Classifier 
 if st.sidebar.button("Train Model Now"):
     st.sidebar.success("Initializing Training...")
     
@@ -83,24 +71,22 @@ if st.sidebar.button("Train Model Now"):
     clf = RandomForestClassifier(n_estimators=100)
     clf.fit(X_train, y_train)
     
-    # Save model to session state so it persists
+    # Save model to session state
     st.session_state['model'] = clf
     st.session_state['accuracy'] = accuracy_score(y_test, clf.predict(X_test))
     
-    st.sidebar.markdown(f"**Training Complete!**")
+    st.sidebar.markdown("**Training Complete!**")
     st.sidebar.markdown(f"Accuracy: `{st.session_state['accuracy']:.2%}`")
 
-# [cite_start]Main Dashboard View [cite: 60]
+# Main Dashboard View
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Historical Traffic Data")
-    # Add a checkbox to toggle between Normal and Attack data
+    # Checkbox to filter for attacks
     if st.checkbox("Show Attack Examples Only"):
-        # Filter to show only rows where Attack_Label is 1
         st.dataframe(df[df['Attack_Label'] == 1].head(10))
     else:
-        # Show the first 10 rows (mostly Normal)
         st.dataframe(df.head(10))
 
 with col2:
@@ -116,6 +102,7 @@ st.write("Input packet parameters below to test detection capabilities.")
 c1, c2, c3, c4 = st.columns(4)
 p_size = c1.number_input("Packet Size (Bytes)", min_value=0, max_value=2000, value=500)
 duration = c2.number_input("Duration (sec)", min_value=0.0, value=1.5)
+# Using number_input for Protocol/Port (Fixed)
 protocol = c3.number_input("Protocol (Port)", min_value=0, value=80)
 byte_rate = c4.number_input("Byte Rate", min_value=0, value=1200)
 
